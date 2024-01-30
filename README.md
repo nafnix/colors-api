@@ -1,6 +1,6 @@
 # Colors
 
-这是一个用于获取中国传统色和日本传统色的 API。这个项目基于 Cloudflare Worker 创建。每隔一定时间会自动获取中国传统色和日本传统色并存储在 Cloudflare R2 中。
+这是一个用于获取颜色🎨的 API。这个项目基于 Cloudflare Worker 创建。每隔一定时间会自动获取中国传统色和日本传统色并存储在 Cloudflare R2 中。
 
 ## 开发
 
