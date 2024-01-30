@@ -1,3 +1,9 @@
+import {
+  argbFromHex,
+  hexFromArgb,
+  themeFromSourceColor,
+} from "@material/material-color-utilities";
+
 /**
  *  将16进制颜色转为 RGB
  * @param {string} hex 16进制颜色值，示例: #000000
@@ -86,4 +92,35 @@ export async function fetchJapanColors() {
     });
   }
   return JSON.stringify(colors);
+}
+
+/**
+ * 根据 16 进制颜色值生成 Material Design 3 颜色主题
+ * @param {string} hex 16进制颜色值
+ * @returns {Object}
+ */
+export function m3ThemeFromHex(hex) {
+  const theme = themeFromSourceColor(argbFromHex(hex));
+  const result = {
+    source: hexFromArgb(theme.source),
+    schemes: {},
+    palettes: {},
+  };
+
+  for (const [schemeName, scheme] of Object.entries(theme.schemes)) {
+    result.schemes[schemeName] = {};
+
+    for (const [varName, varValue] of Object.entries(scheme.toJSON())) {
+      result.schemes[schemeName][varName] = hexFromArgb(varValue);
+    }
+  }
+
+  for (const [colorName, palette] of Object.entries(theme.palettes)) {
+    result.palettes[colorName] = {};
+    for (let num = 0; num <= 100; num++) {
+      result.palettes[colorName][num] = hexFromArgb(palette.tone(num));
+    }
+  }
+
+  return result;
 }
