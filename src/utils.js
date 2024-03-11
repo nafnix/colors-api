@@ -95,7 +95,7 @@ export async function fetchJapanColors() {
 }
 
 /**
- * 根据 16 进制颜色值生成 Material Design 3 颜色主题
+ * 根据 16 进制颜色值生成 16 进制颜色值的 Material Design 3 颜色主题
  * @param {string} hex 16进制颜色值
  * @returns {Object}
  */
@@ -119,6 +119,59 @@ export function m3ThemeFromHex(hex) {
     result.palettes[colorName] = {};
     for (let num = 0; num <= 100; num++) {
       result.palettes[colorName][num] = hexFromArgb(palette.tone(num));
+    }
+  }
+
+  return result;
+}
+
+/**
+ * 根据 16 进制颜色值生成 TailwindCSS Material Design 3 颜色主题
+ * @param {string} hex 16进制颜色值
+ * @returns {Object}
+ */
+export function m3TailwindCSSThemeFromHex(hex) {
+  /**
+   * 颜色转换器
+   * @param {string} hexColor 16 进制颜色值
+   * @returns 能够接受透明度参数的 rgb 颜色
+   */
+  function colorTransform(hexColor) {
+    return `rgb(${hexToRGB(hexColor).join(' ')} / <alpha-value>)`;
+  }
+
+  /**
+   * 名称转换器
+   * @param {string} name 名称
+   * @returns 将驼峰名称中的大写转为小写，并在其前加个 -
+   */
+  function nameTransform(name) {
+    return name.replace(/([A-Z])/g, "-$1").toLowerCase()
+  }
+
+  const theme = themeFromSourceColor(argbFromHex(hex));
+  const result = {
+    source: hexFromArgb(theme.source),
+  };
+
+  for (let [varName, varValue] of Object.entries(theme.schemes.light.toJSON())) {
+    const hexValue = hexFromArgb(varValue);
+    const color = colorTransform(hexValue)
+    varName = nameTransform(varName);
+    result[varName] = color;
+  }
+
+  for (let [varName, varValue] of Object.entries(theme.schemes.dark.toJSON())) {
+    const hexValue = hexFromArgb(varValue);
+    varName = nameTransform(varName);
+    result[`${varName}-dark`] = colorTransform(hexValue);
+  }
+
+  for (let [colorName, palette] of Object.entries(theme.palettes)) {
+    for (let num = 1; num <= 100; num++) {
+      const hexValue = hexFromArgb(palette.tone(num));
+      colorName = nameTransform(colorName);
+      result[`${colorName}-${num}`] = colorTransform(hexValue);
     }
   }
 
