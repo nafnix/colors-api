@@ -7,14 +7,15 @@
     "dev": "wrangler dev --test-scheduled"
   },
   "dependencies": {
-    "@cloudflare/itty-router-openapi": "^1.0.1",
+    "@cloudflare/itty-router-openapi": "^1.0.12",
     "@material/material-color-utilities": "^0.2.7"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240117.0",
-    "@types/node": "^20.5.7",
-    "@types/service-worker-mock": "^2.0.1",
-    "typescript": "^5.3.3",
-    "wrangler": "^3.0.0"
+    "@cloudflare/workers-types": "^4.20240222.0",
+    "@types/node": "^20.11.25",
+    "@types/service-worker-mock": "^2.0.4",
+    "typescript": "^5.4.2",
+    "wrangler": "^3.32.0",
+    "zod": "^3.22.4"
   }
 }
