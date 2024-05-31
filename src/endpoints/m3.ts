@@ -23,14 +23,15 @@ export class M3Colors extends OpenAPIRoute {
         description: "返回颜色值类型",
       }),
       themeName: Query(String, {
-        description: "主题名称(如果是)",
+        description: "主题名称(只有 type 值是 unocss 才可用)",
         required: false,
         default: "nafnix",
       }),
     },
     responses: {
       "200": {
-        description: "JSON 格式的 Material Design 3 主题",
+        description:
+          "Material Design 3 主题，如果 type 值是 unocss，则返回文件，否则是 JSON 格式。",
         // schema: new Str({ format: "binary" }),
         // schema: new Str(),
       },
