@@ -2,11 +2,14 @@ import {
   OpenAPIRoute,
   OpenAPIRouteSchema,
   Query,
-  Enumeration,
 } from "@cloudflare/itty-router-openapi";
-import { type Env } from "~/types";
-import { m3ThemeFromHex, m3TailwindCSSThemeFromHex } from "~/utils";
+import {
+  m3ThemeFromHex,
+  m3TailwindCSSThemeFromHex,
+  m3UnoCSSThemeFromHex,
+} from "~/utils";
 import { z } from "zod";
+
 export class M3Colors extends OpenAPIRoute {
   static schema: OpenAPIRouteSchema = {
     tags: ["Colors"],
@@ -19,10 +22,17 @@ export class M3Colors extends OpenAPIRoute {
       type: Query(z.enum(["css", "tailwindcss", "unocss"]), {
         description: "返回颜色值类型",
       }),
+      themeName: Query(String, {
+        description: "主题名称(如果是)",
+        required: false,
+        default: "nafnix",
+      }),
     },
     responses: {
       "200": {
         description: "JSON 格式的 Material Design 3 主题",
+        // schema: new Str({ format: "binary" }),
+        // schema: new Str(),
       },
     },
   };
@@ -33,16 +43,27 @@ export class M3Colors extends OpenAPIRoute {
     context: any,
     data: Record<
       "query",
-      { hex: string; type: "css" | "tailwindcss" | "unocss" }
+      {
+        hex: string;
+        type: "css" | "tailwindcss" | "unocss";
+        themeName: string;
+      }
     >
   ) {
-    const { hex, type } = data.query;
+    const { hex, type, themeName } = data.query;
 
     switch (type) {
       case "css":
         return m3ThemeFromHex(hex);
 
       case "unocss":
+        return new Response(await m3UnoCSSThemeFromHex(hex, themeName), {
+          headers: {
+            "Content-Type": "application/javascript; charset=UTF-8",
+            "Content-Disposition": `attachment; filename=unocss-md3-${themeName}-preset.ts`,
+          },
+        });
+
       case "tailwindcss":
         return m3TailwindCSSThemeFromHex(hex);
 

@@ -2,7 +2,6 @@ import {
   OpenAPIRoute,
   OpenAPIRouteSchema,
 } from "@cloudflare/itty-router-openapi";
-import { type Env } from "~/types";
 import { fetchChinaColors } from "~/utils";
 import { Str, Num } from "@cloudflare/itty-router-openapi";
 
