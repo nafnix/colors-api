@@ -188,12 +188,12 @@ export function m3UnoCSSThemeFromHex(hex: string, themeName: string) {
 
   export default definePreset(() => {
     const schemeAliasMap: { [key: string]: string } = {
-      P: 'primary',
-      S: 'secondary',
-      T: 'tertiary',
-      E: 'error',
-      N: 'neutral',
-      NV: 'neutralVariant',
+      p: 'primary',
+      s: 'secondary',
+      t: 'tertiary',
+      e: 'error',
+      n: 'neutral',
+      nv: 'neutralVariant',
     }
 
     return {
@@ -226,7 +226,7 @@ export function m3UnoCSSThemeFromHex(hex: string, themeName: string) {
           // equal to \`opacity: '(0..100)'\`
           n0to100: Array.from({ length: 101 }, (_, i) => i.toString()),
           colorSelector: '${colorSelector}',
-          schemeAlias: ['P', 'S', 'T', 'E', 'N', 'NV']
+          schemeAlias: Object.keys(schemeAliasMap)
         },
       },
       theme: {
