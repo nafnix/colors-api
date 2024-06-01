@@ -165,6 +165,27 @@ function themeFromHex(hex: string) {
       colorMap[num] = colorTransform(hexValue);
     }
   }
+  const neutral = (num: number) => result["neutral"][num];
+  const surfaceOther: { [key: string]: string } = {
+    Dim: neutral(87),
+    Bright: neutral(98),
+    ContainerLowest: neutral(100),
+    ContainerLow: neutral(96),
+    Container: neutral(94),
+    ContainerHigh: neutral(92),
+    ContainerHighest: neutral(90),
+
+    DimDark: neutral(6),
+    BrightDark: neutral(24),
+    ContainerLowestDark: neutral(4),
+    ContainerLowDark: neutral(10),
+    ContainerDark: neutral(12),
+    ContainerHighDark: neutral(17),
+    ContainerHighestDark: neutral(24),
+  };
+  for (const key in surfaceOther) {
+    result[`surface${key}`] = surfaceOther[key];
+  }
 
   return result;
 }
@@ -178,10 +199,13 @@ export function m3TailwindCSSThemeFromHex(hex: string) {
   return themeFromHex(hex);
 }
 
-export function m3UnoCSSThemeFromHex(hex: string, themeName: string) {
+export function m3UnoCSSThemeFromHex(hex: string) {
   const colors = themeFromHex(hex);
 
   const colorSelector = "(text|bg|border|outline|decoration|fill|stroke)";
+
+  const themeName = "material";
+  const name = "md3";
 
   const result = `
   import { definePreset } from 'unocss'
@@ -196,44 +220,40 @@ export function m3UnoCSSThemeFromHex(hex: string, themeName: string) {
       nv: 'neutralVariant',
     }
 
+    const ${themeName} = ${JSON.stringify(colors, undefined, 2)}
+
     return {
-      name: 'md3-${themeName}-preset',
+      name: '${themeName}-preset',
       shortcuts: [
         [
-          /^md3-${colorSelector}-${themeName}-([a-zA-Z]+(?:-(?:100|[1-9]\\d|\\d))?)(?:\\/(100|[1-9]\\d|\\d))?$/,
-          ([,selector, color, opacity]) => {
-            const names = color.split('-')
-            let base: string
-            if (names[0] in schemeAliasMap) {
-              base = \`\${selector}-${themeName}-\$\{schemeAliasMap[names[0]]}\`
-              if (names.length > 1) {
-                base = \`\${base}-\${names[1]}\`
-              }
-            }
-            else {
-              base = \`\${selector}-${themeName}-\${color}\`
-            }
-            return opacity ? \`\${base}/\${opacity} dark:\${base}Dark/\${opacity}\` : \`\${base} dark:\${base}Dark\`
+          /^${name}-([a-zA-Z]+)-([a-zA-Z]+)(?:-(100|[1-9]\\d|\\d))?(?:\\/(100|[1-9]\\d|\\d))?$/,
+          ([, selector, name, tone, opacity]) => {
+            const color = name in schemeAliasMap ? schemeAliasMap[name] : name
+            const list = [\`\${selector}-${themeName}-\${color}\`]
+            if (tone)
+              list[0] += \`-\${tone}\`
+  
+            if (\`\${color}Dark\` in ${themeName})
+              list.push(\`dark:\${list[0]}Dark\`)
+  
+            return opacity
+              ? list.map(i => \`\${i}/\${opacity}\`).join(' ')
+              : list.join(' ')
           },
         ],
       ],
       autocomplete: {
         templates: [
-          'md3-<colorSelector>-${themeName}-$colors.${themeName}',
-          'md3-<colorSelector>-${themeName}-<schemeAlias>-<n0to100>',
+          '${name}-<colorSelector>-$colors.${themeName}',
+          '${name}-<colorSelector>-<schemeAlias>-<n0to100>',
         ],
         shorthands: {
-          // equal to \`opacity: '(0..100)'\`
-          n0to100: Array.from({ length: 101 }, (_, i) => i.toString()),
           colorSelector: '${colorSelector}',
+          n0to100: Array.from({ length: 101 }, (_, i) => i.toString()),
           schemeAlias: Object.keys(schemeAliasMap)
         },
       },
-      theme: {
-        colors: {
-          ${themeName}: ${JSON.stringify(colors, undefined, 2)}
-        }, 
-      },
+      theme: { colors: { ${themeName} } },
     }
   })`;
   return prettierTs(result);

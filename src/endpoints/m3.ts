@@ -22,11 +22,6 @@ export class M3Colors extends OpenAPIRoute {
       type: Query(z.enum(["css", "tailwindcss", "unocss"]), {
         description: "返回颜色值类型",
       }),
-      themeName: Query(String, {
-        description: "主题名称(只有 type 值是 unocss 才可用)",
-        required: false,
-        default: "nafnix",
-      }),
     },
     responses: {
       "200": {
@@ -47,11 +42,10 @@ export class M3Colors extends OpenAPIRoute {
       {
         hex: string;
         type: "css" | "tailwindcss" | "unocss";
-        themeName: string;
       }
     >
   ) {
-    const { hex, type, themeName } = data.query;
+    const { hex, type } = data.query;
 
     switch (type) {
       case "css":
@@ -59,10 +53,10 @@ export class M3Colors extends OpenAPIRoute {
 
       case "unocss":
         // TODO: 支持主题切换
-        return new Response(await m3UnoCSSThemeFromHex(hex, themeName), {
+        return new Response(await m3UnoCSSThemeFromHex(hex), {
           headers: {
             "Content-Type": "application/javascript; charset=UTF-8",
-            "Content-Disposition": `attachment; filename=unocss-md3-${themeName}-preset.ts`,
+            "Content-Disposition": `attachment; filename=md3-preset.ts`,
           },
         });
 
